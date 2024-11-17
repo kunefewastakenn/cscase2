@@ -1,2 +1,3 @@
-# cscase2
-A case opening game built entierly with python and pygame
+# CASE2
+
+Simple case opening game built entierly with python and pygame libary.
