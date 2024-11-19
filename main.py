@@ -478,7 +478,7 @@ def main_game_loop():
     pygame.quit()
     RPC.close()
 
-# Entry point of the script
+
 if __name__ == "__main__":
     load_images()
     main_game_loop()
