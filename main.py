@@ -14,7 +14,7 @@ RPC = Presence(client_id)
 RPC.connect()
 
 ANIMATION_ITEMS = 20
-DEBOUNCE_TIME = 100  
+DEBOUNCE_TIME = 100   
 CASE_OPEN_COOLDOWN = 400
 
 def update_discord_presence(state, details, large_image_key=None, small_image_key=None):
@@ -25,7 +25,7 @@ def update_discord_presence(state, details, large_image_key=None, small_image_ke
         small_image=small_image_key
     )
 
-update_discord_presence("In Menu", "Selecting a case")
+update_discord_presence("In Menu", "Selecting a case to open")
 
 
 white = (255, 255, 255)
@@ -50,7 +50,7 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 icon_path = get_file_path("Images", "icon.png")
 icon = pygame.image.load(icon_path)
 pygame.display.set_icon(icon)
-pygame.display.set_caption("CASE2 CSGO Case Opening")
+pygame.display.set_caption("CASE2 Case Opener")
 
 
 items = {
@@ -120,11 +120,11 @@ items = {
 }
 
 rarity_probabilities = {
-    "Common": 0.40,
+    "Common": 0.45,
     "Uncommon": 0.20,
-    "Rare": 0.07,
+    "Rare": 0.055,
     "Epic": 0.03,
-    "Legendary": 0.005
+    "Legendary": 0.003
 }
 
 rarity_colors = {
@@ -395,7 +395,7 @@ case_open_sound_file = "caseopen.mp3"
 music_path = get_file_path("Sounds", music_file)
 if os.path.exists(music_path):
     pygame.mixer.music.load(music_path)
-    pygame.mixer.music.set_volume(0.06)  
+    pygame.mixer.music.set_volume(0.03)  
     pygame.mixer.music.play(-1)
 else:
     print(f"Warning: {music_file} file not found.")
@@ -459,7 +459,7 @@ def main_game_loop():
                 save_inventory(inventory)
                 running = False
             elif result == "Main Menu":
-                update_discord_presence("In Menu", "Selecting a case")
+                update_discord_presence("In Menu", "Selecting a case to open")
                 current_menu = "main"
             elif result == "Open Again":
                 continue
