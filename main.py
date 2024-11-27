@@ -15,7 +15,7 @@ RPC.connect()
 
 ANIMATION_ITEMS = 20
 DEBOUNCE_TIME = 100   
-CASE_OPEN_COOLDOWN = 400
+CASE_OPEN_COOLDOWN = 300
 
 def update_discord_presence(state, details, large_image_key=None, small_image_key=None):
     RPC.update(
@@ -41,98 +41,70 @@ text_color = (255, 255, 255)
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
-def get_file_path(folder, file_name):
-    return os.path.join(script_dir, folder, file_name)
+def get_file_path(folder_name, file_name):
+
+    possible_paths = [
+        os.path.join(script_dir, "Images", folder_name, file_name),
+        os.path.join(script_dir, folder_name, file_name),
+        os.path.join(script_dir, file_name)
+    ]
+    
+    for path in possible_paths:
+        if os.path.exists(path):
+            return path
+    
+    print(f"no image")
+    for path in possible_paths:
+        print(path)
+    return None
 
 screen_width = 800
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
-icon_path = get_file_path("Images", "icon.png")
+icon_path = get_file_path("", "icon.png")
 icon = pygame.image.load(icon_path)
 pygame.display.set_icon(icon)
 pygame.display.set_caption("CASE2 Case Opener")
 
 
 items = {
-    "Weapon Case": [
-        {"image": "tec9_ddpat.png", "name": "Tec-9 | Urban DDPAT", "rarity": "Common"},
-        {"image": "mp9blacksand.png", "name": "MP9 | Black Sand", "rarity": "Common"},
-        {"image": "bizonsand.png", "name": "PP-Bizon | Sand Dashed", "rarity": "Common"},
-        {"image": "ak47safari.png", "name": "AK-47 | Safari Mesh", "rarity": "Common"},
-        {"image": "deagle_bronze.png", "name": "Desert Eagle | Bronze Deco", "rarity": "Uncommon"},
-        {"image": "tec9slag.png", "name": "Tec-9 | Slag", "rarity": "Uncommon"},
-        {"image": "mac10lightbox.png", "name": "Mac-10 | Light Box", "rarity": "Uncommon"},
-        {"image": "umpmotorized.png", "name": "UMP-45 | Motorized", "rarity": "Uncommon"},
-        {"image": "ak47baroqueurple.png", "name": "AK-47 | Baroque Purple", "rarity": "Uncommon"},
-        {"image": "m4a1s_mud.png", "name": "M4A1-S | Mud-Spec", "rarity": "Uncommon"},
-        {"image": "dualieshideout.png", "name": "Dual Berettas | Hideout", "rarity": "Uncommon"},
-        {"image": "ak47black.png", "name": "AK-47 | Slate", "rarity": "Rare"},
-        {"image": "fivesevenhybrid.png", "name": "Five-SeveN | Hybrid", "rarity": "Rare"},
-        {"image": "ak47_green.png", "name": "AK-47 |  Green Laminate", "rarity": "Rare"},
-        {"image": "m4a1s_blacklotus.png", "name": "M4A1-S | Black Lotus", "rarity": "Rare"},
-        {"image": "mp7justsmile.png", "name": "MP7 | Just Smile", "rarity": "Rare"},
-        {"image": "ak47rainbow.png", "name": "AK-47 | Nightwish", "rarity": "Epic"},
-        {"image": "uspjawbreaker.png", "name": "USP-S | Jawbreaker", "rarity": "Epic"},
-        {"image": "sawedoffanalog.png", "name": "Sawed-Off | Analog", "rarity": "Epic"},
-        {"image": "m4a4etchlord.png", "name": "M4A4 | Etch Lord", "rarity": "Epic"},
-        {"image": "zeusolympus.png", "name": "Zeus x27 | Olympus", "rarity": "Epic"},
-        {"image": "awp_hydra.png", "name": "Hatıra AWP | Desert Hydra", "rarity": "Legendary"},
-        {"image": "ak47inheritance.png", "name": "AK-47 | Inheritance", "rarity": "Legendary"},
-    ],
-    "Knife Case": [
-        {"image": "navaja_forest.png", "name": "Navaja Knife | Forest DDPAT", "rarity": "Common"},
-        {"image": "classicknifeforest.png", "name": "Classic Knife | Forest DDPAT", "rarity": "Common"},
-        {"image": "hook_scorched.png", "name": "Hook Knife | Scorched", "rarity": "Uncommon"},
-        {"image": "daggersauto.png", "name": "Shadow Daggers | Autotronic", "rarity": "Uncommon"},
-        {"image": "stilettokdamas.png", "name": "Stiletto Knife | Damascus Steel", "rarity": "Uncommon"},
-        {"image": "survivalknifeborealforest.png", "name": "Survival Knife | Boreal Forest", "rarity": "Uncommon"},
-        {"image": "gutktiger.png", "name": "Gut Knife | Tiger Tooth", "rarity": "Uncommon"},
-        {"image": "bayonet_doppler.png", "name": "StatTrak™ Bayonet | Doppler", "rarity": "Rare"},
-        {"image": "ursuskslaughter.png", "name": "Ursus Knife | Slaughter", "rarity": "Rare"},
-        {"image": "bowiegamma.png", "name": "Bowie Knife | Gamma Doppler", "rarity": "Rare"},
-        {"image": "falchionlore.png", "name": "Falchion Knife | Lore", "rarity": "Rare"},
-        {"image": "skeletonbluesteel.png", "name": "Skeleton Knife | Blue Steel", "rarity": "Rare"},
-        {"image": "nomadcrimson.png", "name": "Nomad Knife | Crimson Web", "rarity": "Rare"},
-        {"image": "butterfly_stained.png", "name": "Butterfly Knife | Stained", "rarity": "Epic"},
-        {"image": "paracordknife.png", "name": "Paracord Knife | (Vanilla)", "rarity": "Epic"},
-        {"image": "flipkfade.png", "name": "Flip Knife | Fade", "rarity": "Epic"},
-        {"image": "huntsmanmarble.png", "name": "Huntsman Knife | Marble Fade", "rarity": "Epic"},
-        {"image": "kukribluesteel.png", "name": "Kukri Knife | Blue Steel", "rarity": "Epic"},
-        {"image": "talon_case.png", "name": "Talon Knife | Case", "rarity": "Legendary"},
-        {"image": "karambitultraviolet.png", "name": "Karambit | Ultraviolet", "rarity": "Legendary"},
-    ],
-    "Glove Case": [
-        {"image": "hydra_mangrove.png", "name": "Hydra Gloves | Mangrove", "rarity": "Common"},
-        {"image": "wraps_giraffe.png", "name": "Hand Wraps | Giraffe", "rarity": "Uncommon"},
-        {"image": "bloodhoundbronzed.png", "name": "Bloodhound Gloves | Bronzed", "rarity": "Uncommon"},
-        {"image": "specialistfield.png", "name": "Specialist Gloves | Field Agent", "rarity": "Uncommon"},
-        {"image": "moto_polygon.png", "name": "Moto Gloves | Polygon", "rarity": "Rare"},
-        {"image": "wrapscaution.png", "name": "Hand Wraps | CAUTION!", "rarity": "Rare"},
-        {"image": "specialistcrimson.png", "name": "Specialist Gloves | Crimson Web", "rarity": "Rare"},
-        {"image": "specialistmarble.png", "name": "Specialist Gloves | Marble Fade", "rarity": "Rare"},
-        {"image": "driver_imperial.png", "name": "Driver Gloves | Imperial Plaid", "rarity": "Epic"},
-        {"image": "motogblood.png", "name": "Moto Gloves | Blood Pressure", "rarity": "Epic"},
-        {"image": "driverblacktie.png", "name": "Driver Gloves | Black Tie", "rarity": "Epic"},
-        {"image": "sport_vice.png", "name": "Sport Gloves | Vice", "rarity": "Legendary"},
-        {"image": "driversnowleopard.png", "name": "Driver Gloves | Snow Leopard", "rarity": "Legendary"},
-        {"image": "brokenfangjade.png", "name": "Broken Fang Gloves | Jade", "rarity": "Legendary"},
+    "Dreams & Nightmares Case": [
+        {"image": "SCAR-20Poultrygeist.png", "name": "SCAR-20 | Poultrygeist", "rarity": "Mil-Spec"},
+        {"image": "MAG-7Foresight.png", "name": "MAG-7 | Foresight", "rarity": "Mil-Spec"},
+        {"image": "P2000LiftedSpirits.png", "name": "P2000 | Lifted Spirits", "rarity": "Mil-Spec"},
+        {"image": "Sawed-OffSpiritBoard.png", "name": "Sawed-Off | Spirit Board", "rarity": "Mil-Spec"},
+        {"image": "MP5-SDNecroJr.png", "name": "MP5-SD | Necro Jr.", "rarity": "Mil-Spec"},
+        {"image": "MAC-10Ensnared.png", "name": "MAC-10 | Ensnared", "rarity": "Mil-Spec"},
+        {"image": "Five-SeveNScrawl.png", "name": "Five-SeveN | Scrawl", "rarity": "Mil-Spec"},
+        {"image": "XM1014ZombieOffensive.png", "name": "XM1014 | Zombie Offensive", "rarity": "Restricted"},
+        {"image": "PP-BizonSpaceCat.png", "name": "PP-Bizon | Space Cat", "rarity": "Restricted"},
+        {"image": "G3SG1DreamGlade.png", "name": "G3SG1 | Dream Glade", "rarity": "Restricted"},
+        {"image": "USP-STickettoHell.png", "name": "USP-S | Ticket to Hell", "rarity": "Restricted"},
+        {"image": "M4A1-SNightTerror.png", "name": "M4A1-S | Night Terror", "rarity": "Restricted"},
+        {"image": "FAMASRapidEyeMovement.png", "name": "FAMAS | Rapid Eye Movement", "rarity": "Classified"},
+        {"image": "MP7AbyssalApparition.png", "name": "MP7 | Abyssal Apparition", "rarity": "Classified"},
+        {"image": "DualBerettaMelondrama.png", "name": "Dual Berettas | Melondrama", "rarity": "Classified"},
+        {"image": "MP9StarlightProtector.png", "name": "MP9 | Starlight Protector", "rarity": "Classified"},
+        {"image": "AK-47Nightwish.png", "name": "AK-47 | Nightwish", "rarity": "Classified"},
+        {"image": "special.png", "name": "Special Item", "rarity": "Legendary"},
+
     ]
 }
 
 rarity_probabilities = {
-    "Common": 0.45,
-    "Uncommon": 0.20,
-    "Rare": 0.055,
-    "Epic": 0.03,
+    "Mil-Spec": 0.45,
+    "Restricted": 0.20,
+    "Classified": 0.055,
+    "Covert": 0.03,
     "Legendary": 0.003
 }
 
 rarity_colors = {
-    "Common": (192, 192, 192),  
-    "Uncommon": (0, 0, 255),    
-    "Rare": (128, 0, 128),      
-    "Epic": (255, 105, 180),    
-    "Legendary": (255, 215, 0)  
+    "Mil-Spec": (81, 106, 242),
+    "Restricted": (127, 80, 246),
+    "Classified": (193, 66, 222),
+    "Covert": (216, 87, 82),
+    "Legendary": (255, 215, 0)
 }
 
 def scale_image(image, size):
@@ -141,15 +113,22 @@ def scale_image(image, size):
 def load_images():
     for case_type in items:
         for item in items[case_type]:
-            try:
-                image_path = get_file_path("Images", item["image"])
-                original_image = pygame.image.load(image_path).convert_alpha()
-                
-                large_image = scale_image(original_image, (200, 200))
-                item["large_image"] = large_image
-                item["small_image"] = scale_image(large_image, (150, 150))
-            except pygame.error:
-                print(f"Warning: {item['image']} file could not be loaded. Default color will be used.")
+            image_path = get_file_path("DreamsAndNightmares", item["image"])
+            if image_path:
+                try:
+                    original_image = pygame.image.load(image_path).convert_alpha()
+                    
+                    large_image = scale_image(original_image, (200, 200))
+                    item["large_image"] = large_image
+                    item["small_image"] = scale_image(large_image, (150, 150))
+                except pygame.error:
+                    print(f"warniga: {item['image']} color being used lol")
+                    item["large_image"] = pygame.Surface((200, 200), pygame.SRCALPHA)
+                    item["large_image"].fill(grey)
+                    item["small_image"] = pygame.Surface((150, 150), pygame.SRCALPHA)
+                    item["small_image"].fill(grey)
+            else:
+                print(f"warniga: {item['image']} file eror")
                 item["large_image"] = pygame.Surface((200, 200), pygame.SRCALPHA)
                 item["large_image"].fill(grey)
                 item["small_image"] = pygame.Surface((150, 150), pygame.SRCALPHA)
@@ -160,10 +139,12 @@ def get_random_item(case_type):
     return random.choice([item for item in items[case_type] if item["rarity"] == rarity])
 
 class Button:
-    def __init__(self, x, y, width, height, color, text, text_color=black, border_radius=10):
+    def __init__(self, x, y, width, height, color, text, text_color=black, border_radius=10, image=None):
         self.original_rect = pygame.Rect(x, y, width, height)
         self.rect = self.original_rect.copy()
         self.color = color
+        self.hover_color = tuple(min(255, c + 50) for c in color)
+        self.press_color = tuple(max(0, c - 50) for c in color)
         self.text = text
         self.text_color = text_color
         self.font = pygame.font.Font(None, 32)
@@ -171,48 +152,95 @@ class Button:
         self.last_click_time = 0
         self.is_hovered = False
         self.is_clicked = False
-        self.animation_progress = 0
+        
+
         self.hover_scale = 1.05
         self.click_scale = 0.95
+        self.scale_progress = 1.0
+        self.color_progress = 1.0
+        self.shadow_offset = 3
+        self.image = image
+
+    def draw(self, screen):
+
+        shadow_rect = self.rect.move(self.shadow_offset, self.shadow_offset)
+        pygame.draw.rect(screen, (50, 50, 50), shadow_rect, border_radius=self.border_radius)
+        
+
+        current_color = self._interpolate_color()
+        
+
+        scaled_rect = pygame.Rect(
+            self.rect.x, 
+            self.rect.y, 
+            int(self.rect.width * self.scale_progress), 
+            int(self.rect.height * self.scale_progress)
+        )
+        scaled_rect.center = self.rect.center
+        
+
+        pygame.draw.rect(screen, current_color, scaled_rect, border_radius=self.border_radius)
+        
+
+        pygame.draw.rect(screen, black, scaled_rect, 2, border_radius=self.border_radius)
+        
+
+        text_surface = self.font.render(self.text, True, self.text_color)
+        text_rect = text_surface.get_rect(center=scaled_rect.center)
+        screen.blit(text_surface, text_rect)
+
+        if self.image:
+            scaled_image = pygame.transform.smoothscale(
+                self.image, 
+                (int(self.image.get_width() * self.scale_progress), 
+                 int(self.image.get_height() * self.scale_progress))
+            )
+            image_rect = scaled_image.get_rect(center=scaled_rect.center)
+            screen.blit(scaled_image, image_rect)
 
     def update(self, mouse_pos, mouse_pressed):
+
         self.is_hovered = self.original_rect.collidepoint(mouse_pos)
         self.is_clicked = self.is_hovered and mouse_pressed[0]
+        
 
-        target_progress = 1 if self.is_clicked else (0.5 if self.is_hovered else 0)
-        self.animation_progress += (target_progress - self.animation_progress) * 0.2
+        if self.is_clicked:
+            target_scale = self.click_scale
+            target_color_progress = 0.7
+        elif self.is_hovered:
+            target_scale = self.hover_scale
+            target_color_progress = 0.8
+        else:
+            target_scale = 1.0
+            target_color_progress = 1.0
+        
 
-        scale = self.click_scale + (self.hover_scale - self.click_scale) * (1 - self.animation_progress)
-        new_width = int(self.original_rect.width * scale)
-        new_height = int(self.original_rect.height * scale)
+        self.scale_progress += (target_scale - self.scale_progress) * 0.2
+        self.color_progress += (target_color_progress - self.color_progress) * 0.2
+        
+
+        new_width = int(self.original_rect.width * self.scale_progress)
+        new_height = int(self.original_rect.height * self.scale_progress)
         self.rect.width = new_width
         self.rect.height = new_height
         self.rect.center = self.original_rect.center
 
-    def draw(self, screen):
-        pygame.draw.rect(screen, self.color, self.rect, border_radius=self.border_radius)
-        pygame.draw.rect(screen, black, self.rect, 2, border_radius=self.border_radius)
-        text_surface = self.font.render(self.text, True, self.text_color)
-        text_rect = text_surface.get_rect(center=self.rect.center)
-        screen.blit(text_surface, text_rect)
+    def _interpolate_color(self):
+
+        base_r, base_g, base_b = self.color
+        hover_r, hover_g, hover_b = self.hover_color
+        
+        interpolated_r = base_r + (hover_r - base_r) * (1 - self.color_progress)
+        interpolated_g = base_g + (hover_g - base_g) * (1 - self.color_progress)
+        interpolated_b = base_b + (hover_b - base_b) * (1 - self.color_progress)
+        
+        return (int(interpolated_r), int(interpolated_g), int(interpolated_b))
 
     def check_click(self, pos, event):
         return self.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1
 
-def update_buttons(buttons):
-    mouse_pos = pygame.mouse.get_pos()
-    mouse_pressed = pygame.mouse.get_pressed()
-    for button in buttons:
-        button.update(mouse_pos, mouse_pressed)
-
-def draw_buttons(buttons, screen):
-    for button in buttons:
-        button.draw(screen)
-
 menu_buttons = [
-    Button(100, 100, 200, 50, (255, 255, 255), "Weapon Case", black),
-    Button(100, 200, 200, 50, (255, 255, 255), "Knife Case", black),
-    Button(100, 300, 200, 50, (255, 255, 255), "Glove Case", black),
+    Button(75, 20, 350, 50, (255, 255, 255), "Dreams & Nightmares Case", black),
     Button(screen_width - 300, screen_height - 100, 200, 50, (255, 255, 255), "Open Case", black),
     Button(screen_width - 300, 20, 200, 50, (255, 255, 255), "Quit", black),
     Button(screen_width - 300, screen_height - 170, 200, 50, (255, 255, 255), "Inventory", black)
@@ -267,7 +295,7 @@ def show_result(item):
         item_rect = pygame.Rect(screen_width // 2 - item_size // 2, screen_height // 2 - item_size // 2 - 50, item_size, item_size)
         screen.blit(item["large_image"], item_rect)
         
-        font = pygame.font.Font(None, 36)
+        font = pygame.font.Font(None, 28)
         text_surface = font.render(item["name"], True, white)
         text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2 + 100))
         screen.blit(text_surface, text_rect)
@@ -398,7 +426,7 @@ if os.path.exists(music_path):
     pygame.mixer.music.set_volume(0.03)  
     pygame.mixer.music.play(-1)
 else:
-    print(f"Warning: {music_file} file not found.")
+    print(f"Warniga: {music_file} no file")
 
 case_open_sound = None
 case_open_sound_path = get_file_path("Sounds", case_open_sound_file)
@@ -406,7 +434,7 @@ if os.path.exists(case_open_sound_path):
     case_open_sound = pygame.mixer.Sound(case_open_sound_path)
     case_open_sound.set_volume(1)  
 else:
-    print(f"Warning: {case_open_sound_file} file not found.")
+    print(f"Warniga: {case_open_sound_file} no file")
 
 load_images()
 
@@ -446,7 +474,8 @@ def main_game_loop():
             
             if selected_case:
                 text_surface = font.render(f"Selected Case: {selected_case}", True, white)
-                screen.blit(text_surface, (10, 10))
+                screen.blit(text_surface, (10, 550))
+                font = pygame.font.Font(None, 28)
 
         elif current_menu == "opening":
             update_discord_presence("Opening a case", f"Opening a {selected_case}")
