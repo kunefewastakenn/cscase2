@@ -30,22 +30,17 @@ update_discord_presence("In Menu", "Selecting a case to open")
 
 white = (255, 255, 255)
 black = (0, 0, 0)
-grey = (200, 200, 200)
-red = (255, 0, 0)
-blue = (0, 0, 255)
 grey = (26, 26, 31)
-button_color = (100, 100, 255)
-hover_color = (150, 150, 255)
-press_color = (50, 50, 200)
+red = (255, 0, 0)
 text_color = (255, 255, 255)
+
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 def get_file_path(folder_name, file_name):
-
     possible_paths = [
-        os.path.join(script_dir, "Images", folder_name, file_name),
-        os.path.join(script_dir, folder_name, file_name),
+        os.path.join(script_dir, "Images", "DreamsAndNightmaresCase", file_name) if folder_name == "DreamsAndNightmaresCase" else os.path.join(script_dir, "Images", folder_name, file_name),
+        os.path.join(script_dir, "DreamsAndNightmaresCase", file_name) if folder_name == "DreamsAndNightmaresCase" else os.path.join(script_dir, folder_name, file_name),
         os.path.join(script_dir, file_name)
     ]
     
@@ -53,9 +48,7 @@ def get_file_path(folder_name, file_name):
         if os.path.exists(path):
             return path
     
-    print(f"no image")
-    for path in possible_paths:
-        print(path)
+    print(f"Warning: {file_name} not found in {folder_name}")
     return None
 
 screen_width = 800
@@ -66,9 +59,8 @@ icon = pygame.image.load(icon_path)
 pygame.display.set_icon(icon)
 pygame.display.set_caption("CASE2 Case Opener")
 
-
 items = {
-    "Dreams & Nightmares Case": [
+    "Dreams And Nightmares Case": [
         {"image": "SCAR-20Poultrygeist.png", "name": "SCAR-20 | Poultrygeist", "rarity": "Mil-Spec"},
         {"image": "MAG-7Foresight.png", "name": "MAG-7 | Foresight", "rarity": "Mil-Spec"},
         {"image": "P2000LiftedSpirits.png", "name": "P2000 | Lifted Spirits", "rarity": "Mil-Spec"},
@@ -87,7 +79,25 @@ items = {
         {"image": "MP9StarlightProtector.png", "name": "MP9 | Starlight Protector", "rarity": "Classified"},
         {"image": "AK-47Nightwish.png", "name": "AK-47 | Nightwish", "rarity": "Classified"},
         {"image": "special.png", "name": "Special Item", "rarity": "Legendary"},
-
+    ],
+    "Clutch Case": [
+        {"image": "XM1014OxideBlaze.png", "name": "XM1014 | Oxide Blaze", "rarity": "Mil-Spec"},
+        {"image": "PP-BizonNightRiot.png", "name": "PP-Bizon | Night Riot", "rarity": "Mil-Spec"},
+        {"image": "P2000UrbanHazard.png", "name": "P2000 | Urban Hazard", "rarity": "Mil-Spec"},
+        {"image": "SG553Aloha.png", "name": "SG 553 | Aloha", "rarity": "Mil-Spec"},
+        {"image": "MP9BlackSand.png", "name": "MP9 | Black Sand", "rarity": "Mil-Spec"},
+        {"image": "R8RevolverGrip.png", "name": "R8 Revolver | Grip", "rarity": "Mil_spec"},
+        {"image": "NovaWildSix.png", "name": "Nova | Wild Six", "rarity": "Restricted"},
+        {"image": "UMP-45ArcticWolf.png", "name": "UMP-45 | Arctic Wolf", "rarity": "Restricted"},
+        {"image": "NegevLionfish.png", "name": "Negev | Lionfish", "rarity": "Restricted"},
+        {"image": "MAG-7SWAG-7.png", "name": "MAG-7 | SWAG-7", "rarity": "Restricted"},
+        {"image": "Glock-18Moonrise.png", "name": "Glock-18 | Moonrise", "rarity": "Restricted"},
+        {"image": "AUGStymphalian.png", "name": "AUG | Stymphalian", "rarity": "Classified"},
+        {"image": "AWPMortis.png", "name": "AWP | Mortis", "rarity": "Classified"},
+        {"image": "USP-SCortex.png", "name": "USP-S | Cortex", "rarity": "Classified"},
+        {"image": "M4A4Neo-Noir.png", "name": "M4A4 | Neo-Noir", "rarity": "Covert"},
+        {"image": "MP7Bloodsport.png", "name": "MP7 | Bloodsport", "rarity": "Covert"},
+        {"image": "special.png", "name": "Special Item", "rarity": "Legendary"},
     ]
 }
 
@@ -113,7 +123,7 @@ def scale_image(image, size):
 def load_images():
     for case_type in items:
         for item in items[case_type]:
-            image_path = get_file_path("DreamsAndNightmares", item["image"])
+            image_path = get_file_path(case_type.replace(" ", ""), item["image"])
             if image_path:
                 try:
                     original_image = pygame.image.load(image_path).convert_alpha()
@@ -122,21 +132,35 @@ def load_images():
                     item["large_image"] = large_image
                     item["small_image"] = scale_image(large_image, (150, 150))
                 except pygame.error:
-                    print(f"warniga: {item['image']} color being used lol")
+                    print(f"Warning: {item['image']} loading failed")
                     item["large_image"] = pygame.Surface((200, 200), pygame.SRCALPHA)
                     item["large_image"].fill(grey)
                     item["small_image"] = pygame.Surface((150, 150), pygame.SRCALPHA)
                     item["small_image"].fill(grey)
             else:
-                print(f"warniga: {item['image']} file eror")
+                print(f"Warning: {item['image']} file not found")
                 item["large_image"] = pygame.Surface((200, 200), pygame.SRCALPHA)
                 item["large_image"].fill(grey)
                 item["small_image"] = pygame.Surface((150, 150), pygame.SRCALPHA)
                 item["small_image"].fill(grey)
 
+def load_case_icons():
+    case_icons = {}
+    for case_name in items:
+        icon_path = get_file_path("", f"{case_name.replace(' ', '')}Icon.png")
+        if icon_path and os.path.exists(icon_path):
+            case_icons[case_name] = pygame.image.load(icon_path).convert_alpha()
+        else:
+            print(f"Warning: No icon found for {case_name}")
+
+            case_icons[case_name] = pygame.Surface((200, 200), pygame.SRCALPHA)
+            case_icons[case_name].fill((100, 100, 100))
+    return case_icons
+
 def get_random_item(case_type):
-    rarity = random.choices(list(rarity_probabilities.keys()), weights=rarity_probabilities.values(), k=1)[0]
+    rarity = random.choices(list(rarity_probabilities.keys()), weights=list(rarity_probabilities.values()), k=1)[0]
     return random.choice([item for item in items[case_type] if item["rarity"] == rarity])
+
 
 class Button:
     def __init__(self, x, y, width, height, color, text, text_color=black, border_radius=10, image=None):
@@ -240,50 +264,65 @@ class Button:
         return self.rect.collidepoint(pos) and event.type == pygame.MOUSEBUTTONDOWN and event.button == 1
 
 menu_buttons = [
-    Button(75, 20, 350, 50, (255, 255, 255), "Dreams & Nightmares Case", black),
+    Button(75, 20, 350, 50, (255, 255, 255), "Dreams And Nightmares Case", black),
+    Button(75, 120, 350, 50, (255, 255, 255), "Clutch Case", black),
     Button(screen_width - 300, screen_height - 100, 200, 50, (255, 255, 255), "Open Case", black),
     Button(screen_width - 300, 20, 200, 50, (255, 255, 255), "Quit", black),
     Button(screen_width - 300, screen_height - 170, 200, 50, (255, 255, 255), "Inventory", black)
 ]
 
 result_buttons = [
-    Button(100, screen_height - 100, 200, 50, (255, 255, 255), "Main Menu", black),
+    Button(100, screen_height - 150, 200, 50, (255, 255, 255), "Main Menu", black),
     Button(screen_width - 300, screen_height - 100, 200, 50, (255, 255, 255), "Open Again", black)
 ]
 
 inventory_buttons = [
-    Button(screen_width - 220, screen_height - 70, 200, 50, (255, 255, 255), "Back to Menu", black)
+    Button(screen_width - 250, screen_height - 50, 200, 50, (255, 255, 255), "Back to Menu", black)
 ]
 
 def animate_case_opening(case_type):
     item_size = 150
     item_gap = 30
     num_items = ANIMATION_ITEMS
-    
     total_width = num_items * (item_size + item_gap)
-    animation_duration = 2700
+    animation_duration = 2700 
     start_time = pygame.time.get_ticks()
     
+
     randomized_items = [random.choice(items[case_type]) for _ in range(num_items)]
     
     if case_open_sound:
         case_open_sound.play()
     
-    while pygame.time.get_ticks() - start_time < animation_duration:
-        screen.fill(grey)
-        offset = (pygame.time.get_ticks() - start_time) / animation_duration * (total_width + screen_width)
-        for i in range(num_items):
-            x = screen_width + (i * (item_size + item_gap)) - offset
-            y = screen_height // 4 - item_size // 4
-            if -item_size <= x <= screen_width:
-                screen.blit(randomized_items[i]["small_image"], (x, y))
+
+    while True:
+        current_time = pygame.time.get_ticks()
+        elapsed_time = current_time - start_time
         
-        pygame.draw.line(screen, red, (screen_width // 2, 0), (screen_width // 2, screen_height), 2)
-        
-        pygame.display.flip()
-        pygame.time.delay(10)
-    
-    return get_random_item(case_type)
+        if elapsed_time < animation_duration:
+            screen.fill(grey)
+            offset = elapsed_time / animation_duration * (total_width + screen_width)
+            
+            for i in range(num_items):
+                x = screen_width + (i * (item_size + item_gap)) - offset
+                y = screen_height // 4 - item_size // 4
+                
+                if -item_size <= x <= screen_width:
+                    screen.blit(randomized_items[i]["small_image"], (x, y))
+            
+            pygame.draw.line(screen, red, (screen_width // 2, 0), (screen_width // 2, screen_height), 2)
+            pygame.display.flip()
+            pygame.time.delay(15)
+        else:
+
+            final_item = get_random_item(case_type)
+            screen.fill(grey)
+            screen.blit(final_item["large_image"], (screen_width // 2 - item_size // 2, screen_height // 2 - item_size // 2))
+            pygame.display.flip()
+            break 
+
+    return final_item
+
 
 def show_result(item):
     result = None
