@@ -132,13 +132,13 @@ def load_images():
                     item["large_image"] = large_image
                     item["small_image"] = scale_image(large_image, (150, 150))
                 except pygame.error:
-                    print(f"Warning: {item['image']} loading failed")
+                    print(f"Warnin: {item['image']} loadin't")
                     item["large_image"] = pygame.Surface((200, 200), pygame.SRCALPHA)
                     item["large_image"].fill(grey)
                     item["small_image"] = pygame.Surface((150, 150), pygame.SRCALPHA)
                     item["small_image"].fill(grey)
             else:
-                print(f"Warning: {item['image']} file not found")
+                print(f"WWarnig: {item['image']} file not found")
                 item["large_image"] = pygame.Surface((200, 200), pygame.SRCALPHA)
                 item["large_image"].fill(grey)
                 item["small_image"] = pygame.Surface((150, 150), pygame.SRCALPHA)
@@ -151,7 +151,7 @@ def load_case_icons():
         if icon_path and os.path.exists(icon_path):
             case_icons[case_name] = pygame.image.load(icon_path).convert_alpha()
         else:
-            print(f"Warning: No icon found for {case_name}")
+            print(f"no icon for {case_name} lol")
 
             case_icons[case_name] = pygame.Surface((200, 200), pygame.SRCALPHA)
             case_icons[case_name].fill((100, 100, 100))
@@ -272,12 +272,12 @@ menu_buttons = [
 ]
 
 result_buttons = [
-    Button(100, screen_height - 150, 200, 50, (255, 255, 255), "Main Menu", black),
-    Button(screen_width - 300, screen_height - 100, 200, 50, (255, 255, 255), "Open Again", black)
+    Button(100, screen_height - 100, 200, 50, (255, 255, 255), "Main Menu", black),
+    Button(screen_width - 300, screen_height - 100, 200, 50, (255, 255, 255), "Open One More", black)
 ]
 
 inventory_buttons = [
-    Button(screen_width - 250, screen_height - 50, 200, 50, (255, 255, 255), "Back to Menu", black)
+    Button(screen_width - 300, screen_height - 100, 200, 50, (255, 255, 255), "Back to Menu", black)
 ]
 
 def animate_case_opening(case_type):
