@@ -98,7 +98,28 @@ items = {
         {"image": "M4A4Neo-Noir.png", "name": "M4A4 | Neo-Noir", "rarity": "Covert"},
         {"image": "MP7Bloodsport.png", "name": "MP7 | Bloodsport", "rarity": "Covert"},
         {"image": "special.png", "name": "Special Item", "rarity": "Legendary"},
-    ]
+    ],
+        "Kilowatt Case": [
+        {"image": "UMP-45Motorized.png", "name": "UMP-45 | Motorized", "rarity": "Mil-Spec"},
+        {"image": "MAC-10Light Box.png", "name": "MAC-10 | Light Box", "rarity": "Mil-Spec"},
+        {"image": "Dual BerettasHideout.png", "name": "Dual Berettas | Hideout", "rarity": "Mil-Spec"},
+        {"image": "XM1014Irezumi.png", "name": "XM1014 | Irezumi", "rarity": "Mil-Spec"},
+        {"image": "NovaDark Sigil.png", "name": "Nova | Dark Sigil", "rarity": "Mil-Spec"},
+        {"image": "SSG 08Dezastre.png", "name": "SSG 08 | Dezastre", "rarity": "Mil-Spec"},
+        {"image": "Tec-9Slag.png", "name": "Tec-9 | Slag", "rarity": "Mil-Spec"},
+        {"image": "Sawed-OffAnalog Input.png", "name": "Sawed-Off | Analog Input", "rarity": "Restricted"},
+        {"image": "MP7Just Smile.png", "name": "MP7 | Just Smile", "rarity": "Restricted"},
+        {"image": "Glock-18Block-18.png", "name": "Glock-18 | Block-18", "rarity": "Restricted"},
+        {"image": "M4A4Etch Lord.png", "name": "M4A4 | Etch Lord", "rarity": "Restricted"},
+        {"image": "Five-SeveNHybrid.png", "name": "Five-SeveN | Hybrid", "rarity": "Restricted"},
+        {"image": "USP-SJawbreaker.png", "name": "USP-S | Jawbreaker", "rarity": "Classified"},
+        {"image": "Zeus x27Olympus.png", "name": "Zeus x27 | Olympus", "rarity": "Classified"},
+        {"image": "M4A1-SBlack Lotus.png", "name": "M4A1-S | Black Lotus", "rarity": "Classified"},
+        {"image": "AWPChromeCannon.png", "name": "AWP | Chrome Cannon", "rarity": "Covert"},
+        {"image": "AK-47Inheritance.png", "name": "AK-47 | Inheritance", "rarity": "Covert"},
+        {"image": "special.png", "name": "Special Item", "rarity": "Legandary"},
+    ],
+    
 }
 
 rarity_probabilities = {
@@ -266,6 +287,7 @@ class Button:
 menu_buttons = [
     Button(75, 20, 350, 50, (255, 255, 255), "Dreams And Nightmares Case", black),
     Button(75, 120, 350, 50, (255, 255, 255), "Clutch Case", black),
+    Button(75, 220, 350, 50, (255, 255, 255), "Kilowatt Case", black),
     Button(screen_width - 300, screen_height - 100, 200, 50, (255, 255, 255), "Open Case", black),
     Button(screen_width - 300, 20, 200, 50, (255, 255, 255), "Quit", black),
     Button(screen_width - 300, screen_height - 170, 200, 50, (255, 255, 255), "Inventory", black)
