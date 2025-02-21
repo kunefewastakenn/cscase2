@@ -4,36 +4,49 @@ import os
 import json
 import time
 import math
-from pypresence import Presence
+
+discord_enabled = True
+try:
+    from pypresence import Presence
+    client_id = '1268557975396552797'
+    RPC = Presence(client_id)
+    try:
+        RPC.connect()
+    except:
+        discord_enabled = False
+        print("Discord connection failed, running without rich presence")
+except ImportError:
+    discord_enabled = False
+    print("pypresence not found, running without Discord rich presence")
 
 pygame.init()
 pygame.mixer.init()
-
-client_id = '1268557975396552797'  
-RPC = Presence(client_id)
-RPC.connect()
 
 ANIMATION_ITEMS = 20
 DEBOUNCE_TIME = 100   
 CASE_OPEN_COOLDOWN = 300
 
 def update_discord_presence(state, details, large_image_key=None, small_image_key=None):
-    RPC.update(
-        state=state,
-        details=details,
-        large_image=large_image_key,
-        small_image=small_image_key
-    )
+    if discord_enabled:
+        try:
+            RPC.update(
+                state=state,
+                details=details,
+                large_image=large_image_key,
+                small_image=small_image_key
+            )
+        except:
+            pass
 
-update_discord_presence("In Menu", "Selecting a case to open")
 
+if discord_enabled:
+    update_discord_presence("In Menu", "Selecting a case to open")
 
 white = (255, 255, 255)
 black = (0, 0, 0)
 grey = (26, 26, 31)
 red = (255, 0, 0)
 text_color = (255, 255, 255)
-
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -55,8 +68,9 @@ screen_width = 800
 screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 icon_path = get_file_path("", "icon.png")
-icon = pygame.image.load(icon_path)
-pygame.display.set_icon(icon)
+if icon_path:
+    icon = pygame.image.load(icon_path)
+    pygame.display.set_icon(icon)
 pygame.display.set_caption("CASE2 Case Opener")
 
 items = {
@@ -99,7 +113,7 @@ items = {
         {"image": "MP7Bloodsport.png", "name": "MP7 | Bloodsport", "rarity": "Covert"},
         {"image": "special.png", "name": "Special Item", "rarity": "Legendary"},
     ],
-        "Kilowatt Case": [
+    "Kilowatt Case": [
         {"image": "UMP-45Motorized.png", "name": "UMP-45 | Motorized", "rarity": "Mil-Spec"},
         {"image": "MAC-10Light Box.png", "name": "MAC-10 | Light Box", "rarity": "Mil-Spec"},
         {"image": "Dual BerettasHideout.png", "name": "Dual Berettas | Hideout", "rarity": "Mil-Spec"},
@@ -117,9 +131,8 @@ items = {
         {"image": "M4A1-SBlack Lotus.png", "name": "M4A1-S | Black Lotus", "rarity": "Classified"},
         {"image": "AWPChromeCannon.png", "name": "AWP | Chrome Cannon", "rarity": "Covert"},
         {"image": "AK-47Inheritance.png", "name": "AK-47 | Inheritance", "rarity": "Covert"},
-        {"image": "special.png", "name": "Special Item", "rarity": "Legandary"},
+        {"image": "special.png", "name": "Special Item", "rarity": "Legendary"},
     ],
-    
 }
 
 rarity_probabilities = {
@@ -135,7 +148,8 @@ rarity_colors = {
     "Restricted": (127, 80, 246),
     "Classified": (193, 66, 222),
     "Covert": (216, 87, 82),
-    "Legendary": (255, 215, 0)
+    "Legendary": (255, 215, 0),
+    "Mil_spec": (81, 106, 242)
 }
 
 def scale_image(image, size):
@@ -153,13 +167,13 @@ def load_images():
                     item["large_image"] = large_image
                     item["small_image"] = scale_image(large_image, (150, 150))
                 except pygame.error:
-                    print(f"Warnin: {item['image']} loadin't")
+                    print(f"Warning: {item['image']} loading failed")
                     item["large_image"] = pygame.Surface((200, 200), pygame.SRCALPHA)
                     item["large_image"].fill(grey)
                     item["small_image"] = pygame.Surface((150, 150), pygame.SRCALPHA)
                     item["small_image"].fill(grey)
             else:
-                print(f"WWarnig: {item['image']} file not found")
+                print(f"Warning: {item['image']} file not found")
                 item["large_image"] = pygame.Surface((200, 200), pygame.SRCALPHA)
                 item["large_image"].fill(grey)
                 item["small_image"] = pygame.Surface((150, 150), pygame.SRCALPHA)
@@ -172,15 +186,26 @@ def load_case_icons():
         if icon_path and os.path.exists(icon_path):
             case_icons[case_name] = pygame.image.load(icon_path).convert_alpha()
         else:
-            print(f"no icon for {case_name} lol")
-
+            print(f"No icon for {case_name} found")
             case_icons[case_name] = pygame.Surface((200, 200), pygame.SRCALPHA)
             case_icons[case_name].fill((100, 100, 100))
     return case_icons
 
 def get_random_item(case_type):
+
+    case_items = items[case_type]
     rarity = random.choices(list(rarity_probabilities.keys()), weights=list(rarity_probabilities.values()), k=1)[0]
-    return random.choice([item for item in items[case_type] if item["rarity"] == rarity])
+    
+    matching_items = [item for item in case_items if item["rarity"] == rarity]
+    
+    if not matching_items and rarity == "Mil-Spec":
+        matching_items = [item for item in case_items if item["rarity"] == "Mil_spec"]
+    
+    if matching_items:
+        return random.choice(matching_items)
+    else:
+
+        return random.choice(case_items)
 
 
 class Button:
@@ -198,7 +223,6 @@ class Button:
         self.is_hovered = False
         self.is_clicked = False
         
-
         self.hover_scale = 1.05
         self.click_scale = 0.95
         self.scale_progress = 1.0
@@ -207,14 +231,11 @@ class Button:
         self.image = image
 
     def draw(self, screen):
-
         shadow_rect = self.rect.move(self.shadow_offset, self.shadow_offset)
         pygame.draw.rect(screen, (50, 50, 50), shadow_rect, border_radius=self.border_radius)
         
-
         current_color = self._interpolate_color()
         
-
         scaled_rect = pygame.Rect(
             self.rect.x, 
             self.rect.y, 
@@ -223,13 +244,10 @@ class Button:
         )
         scaled_rect.center = self.rect.center
         
-
         pygame.draw.rect(screen, current_color, scaled_rect, border_radius=self.border_radius)
         
-
         pygame.draw.rect(screen, black, scaled_rect, 2, border_radius=self.border_radius)
         
-
         text_surface = self.font.render(self.text, True, self.text_color)
         text_rect = text_surface.get_rect(center=scaled_rect.center)
         screen.blit(text_surface, text_rect)
@@ -244,11 +262,9 @@ class Button:
             screen.blit(scaled_image, image_rect)
 
     def update(self, mouse_pos, mouse_pressed):
-
         self.is_hovered = self.original_rect.collidepoint(mouse_pos)
         self.is_clicked = self.is_hovered and mouse_pressed[0]
         
-
         if self.is_clicked:
             target_scale = self.click_scale
             target_color_progress = 0.7
@@ -259,11 +275,9 @@ class Button:
             target_scale = 1.0
             target_color_progress = 1.0
         
-
         self.scale_progress += (target_scale - self.scale_progress) * 0.2
         self.color_progress += (target_color_progress - self.color_progress) * 0.2
         
-
         new_width = int(self.original_rect.width * self.scale_progress)
         new_height = int(self.original_rect.height * self.scale_progress)
         self.rect.width = new_width
@@ -271,7 +285,6 @@ class Button:
         self.rect.center = self.original_rect.center
 
     def _interpolate_color(self):
-
         base_r, base_g, base_b = self.color
         hover_r, hover_g, hover_b = self.hover_color
         
@@ -310,8 +323,17 @@ def animate_case_opening(case_type):
     animation_duration = 2700 
     start_time = pygame.time.get_ticks()
     
+    case_items = items[case_type]
 
-    randomized_items = [random.choice(items[case_type]) for _ in range(num_items)]
+    if not case_items:
+        print(f"Error: No items found for case type {case_type}")
+        return get_random_item(case_type) 
+    
+    randomized_items = []
+    for _ in range(num_items):
+
+        if case_items:
+            randomized_items.append(random.choice(case_items))
     
     if case_open_sound:
         case_open_sound.play()
@@ -330,7 +352,9 @@ def animate_case_opening(case_type):
                 y = screen_height // 4 - item_size // 4
                 
                 if -item_size <= x <= screen_width:
-                    screen.blit(randomized_items[i]["small_image"], (x, y))
+                    item = randomized_items[i]
+                    if "small_image" in item:
+                        screen.blit(item["small_image"], (x, y))
             
             pygame.draw.line(screen, red, (screen_width // 2, 0), (screen_width // 2, screen_height), 2)
             pygame.display.flip()
@@ -339,7 +363,8 @@ def animate_case_opening(case_type):
 
             final_item = get_random_item(case_type)
             screen.fill(grey)
-            screen.blit(final_item["large_image"], (screen_width // 2 - item_size // 2, screen_height // 2 - item_size // 2))
+            if "large_image" in final_item:
+                screen.blit(final_item["large_image"], (screen_width // 2 - item_size // 2, screen_height // 2 - item_size // 2))
             pygame.display.flip()
             break 
 
@@ -354,18 +379,27 @@ def show_result(item):
         screen.fill(grey)
         item_size = 200
         item_rect = pygame.Rect(screen_width // 2 - item_size // 2, screen_height // 2 - item_size // 2 - 50, item_size, item_size)
-        screen.blit(item["large_image"], item_rect)
+        
+        if "large_image" in item:
+            screen.blit(item["large_image"], item_rect)
         
         font = pygame.font.Font(None, 28)
         text_surface = font.render(item["name"], True, white)
         text_rect = text_surface.get_rect(center=(screen_width // 2, screen_height // 2 + 100))
         screen.blit(text_surface, text_rect)
         
-        rarity_surface = font.render(item["rarity"], True, rarity_colors[item["rarity"]])
+        rarity = item["rarity"]
+        rarity_color = rarity_colors.get(rarity, white)
+        
+        rarity_surface = font.render(rarity, True, rarity_color)
         rarity_rect = rarity_surface.get_rect(center=(screen_width // 2, screen_height // 2 + 140))
         screen.blit(rarity_surface, rarity_rect)
         
         cooldown_remaining = max(0, CASE_OPEN_COOLDOWN - (current_time - start_time))
+        
+
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_pressed = pygame.mouse.get_pressed()
         
         for button in result_buttons:
             if cooldown_remaining > 0:
@@ -374,6 +408,7 @@ def show_result(item):
                 text_rect = text_surface.get_rect(center=button.rect.center)
                 screen.blit(text_surface, text_rect)
             else:
+                button.update(mouse_pos, mouse_pressed)
                 button.draw(screen)
         
         if cooldown_remaining > 0:
@@ -390,7 +425,10 @@ def show_result(item):
             if event.type == pygame.MOUSEBUTTONDOWN and cooldown_remaining == 0:
                 for button in result_buttons:
                     if button.check_click(event.pos, event):
-                        result = button.text
+                        if button.text == "Open One More":
+                            return "Open Again"
+                        else:
+                            return button.text
         
         if result:
             return result
@@ -411,7 +449,10 @@ def show_inventory(inventory):
 
         y_offset = 0
         for i, item in enumerate(inventory):
-            item_surface = font.render(f"{item['name']} - {item['rarity']}", True, rarity_colors[item['rarity']])
+            rarity = item.get("rarity", "Mil-Spec")
+            rarity_color = rarity_colors.get(rarity, white)
+            
+            item_surface = font.render(f"{item['name']} - {rarity}", True, rarity_color)
             item_rect = item_surface.get_rect(topleft=(10, y_offset - scroll_y))
             scroll_surface.blit(item_surface, item_rect)
 
@@ -425,7 +466,12 @@ def show_inventory(inventory):
 
         screen.blit(scroll_surface, (20, 70))
 
+
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_pressed = pygame.mouse.get_pressed()
+        
         for button in inventory_buttons:
+            button.update(mouse_pos, mouse_pressed)
             button.draw(screen)
 
         pygame.display.flip()
@@ -456,9 +502,13 @@ def show_inventory(inventory):
             return "inventory"
                     
 def save_inventory(inventory):
-    inventory_data = [{"name": item["name"], "rarity": item["rarity"], "image": item["image"]} for item in inventory]
-    with open("inventory.json", "w") as f:
-        json.dump(inventory_data, f)
+    try:
+        inventory_data = [{"name": item["name"], "rarity": item["rarity"], "image": item["image"]} 
+                         for item in inventory if "name" in item and "rarity" in item and "image" in item]
+        with open("inventory.json", "w") as f:
+            json.dump(inventory_data, f)
+    except Exception as e:
+        print(f"Error saving inventory: {e}")
 
 def load_inventory():
     try:
@@ -477,17 +527,26 @@ def load_inventory():
         return inventory
     except FileNotFoundError:
         return []
+    except Exception as e:
+        print(f"Error loading inventory: {e}")
+        return []
 
 music_file = "menumusic.mp3"
 case_open_sound_file = "caseopen.mp3"
 
 music_path = get_file_path("Sounds", music_file)
-if os.path.exists(music_path):
-    pygame.mixer.music.load(music_path)
-    pygame.mixer.music.set_volume(0.03)  
-    pygame.mixer.music.play(-1)
+if music_path and os.path.exists(music_path):
+    try:
+        pygame.mixer.music.load(music_path)
+        pygame.mixer.music.set_volume(0.03)  
+        pygame.mixer.music.play(-1)
+    except pygame.error:
+        print(f"Warning: Failed to play {music_file}")
 else:
-    print(f"Warniga: {music_file} no file")
+    print(f"Warning: {music_file} not found")
+
+case_open_sound = None
+case_open_sound_path = get_file_path("Sounds", case_open_sound_file)
 
 case_open_sound = None
 case_open_sound_path = get_file_path("Sounds", case_open_sound_file)
