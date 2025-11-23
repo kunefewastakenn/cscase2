@@ -308,7 +308,7 @@ menu_buttons = [
 
 result_buttons = [
     Button(100, screen_height - 100, 200, 50, (255, 255, 255), "Main Menu", black),
-    Button(screen_width - 300, screen_height - 100, 200, 50, (255, 255, 255), "Open One More", black)
+    Button(screen_width - 300, screen_height - 100, 200, 50, (255, 255, 255), "Open Agaib", black)
 ]
 
 inventory_buttons = [
@@ -538,7 +538,7 @@ music_path = get_file_path("Sounds", music_file)
 if music_path and os.path.exists(music_path):
     try:
         pygame.mixer.music.load(music_path)
-        pygame.mixer.music.set_volume(0.03)  
+        pygame.mixer.music.set_volume(0.2)  
         pygame.mixer.music.play(-1)
     except pygame.error:
         print(f"Warning: Failed to play {music_file}")
@@ -554,7 +554,7 @@ if os.path.exists(case_open_sound_path):
     case_open_sound = pygame.mixer.Sound(case_open_sound_path)
     case_open_sound.set_volume(1)  
 else:
-    print(f"Warniga: {case_open_sound_file} no file")
+    print(f"Warnig: {case_open_sound_file} no file")
 
 load_images()
 
