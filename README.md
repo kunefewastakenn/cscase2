@@ -14,3 +14,4 @@ Case opening game made entirely with Python and pygame lib.
 
 Take care :P
 
+# update
