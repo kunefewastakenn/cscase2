@@ -1,0 +1,30 @@
+name: Build Game
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install libraries
+        run: pip install pygame pyinstaller
+
+      - name: Build exe
+        run: pyinstaller --onefile --noconsole --add-data "Images;Images" --add-data "Sounds;Sounds" --add-data "inventory.json;." main.py
+
+      - name: Upload exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: game-windows
+          path: dist/main.exe
